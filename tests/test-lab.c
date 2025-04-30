@@ -1,5 +1,6 @@
 #include "harness/unity.h"
 #include "../src/lab.h"
+#include <pthread.h>
 // NOTE: Due to the multi-threaded nature of this project. Unit testing for this
 // project is limited. I have provided you with a command line tester in
 // the file app/main.cp. Be aware that the examples below do not test the
@@ -7,20 +8,27 @@
 // tester to test the multi-threaded nature of your queue. Passing these tests
 // does not mean your queue is correct. It just means that it can add and remove
 // elements from the queue below the blocking threshold.
+
+// Test data
+static int test_data[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
 void setUp(void)
 {
   // set stuff up here
 }
+
 void tearDown(void)
 {
   // clean stuff up here
 }
+
 void test_create_destroy(void)
 {
   queue_t q = queue_init(10);
   TEST_ASSERT_TRUE(q != NULL);
   queue_destroy(q);
 }
+
 void test_queue_dequeue(void)
 {
   queue_t q = queue_init(10);
@@ -30,6 +38,7 @@ void test_queue_dequeue(void)
   TEST_ASSERT_TRUE(dequeue(q) == &data);
   queue_destroy(q);
 }
+
 void test_queue_dequeue_multiple(void)
 {
   queue_t q = queue_init(10);
@@ -45,6 +54,7 @@ void test_queue_dequeue_multiple(void)
   TEST_ASSERT_TRUE(dequeue(q) == &data3);
   queue_destroy(q);
 }
+
 void test_queue_dequeue_shutdown(void)
 {
   queue_t q = queue_init(10);
@@ -63,6 +73,19 @@ void test_queue_dequeue_shutdown(void)
   TEST_ASSERT_TRUE(is_empty(q));
   queue_destroy(q);
 }
+
+void test_null_queue_handling(void)
+ {
+     // These should not crash
+     queue_destroy(NULL);
+     enqueue(NULL, &test_data[0]);
+     void* result = dequeue(NULL);
+     TEST_ASSERT_TRUE(result == NULL);
+     TEST_ASSERT_TRUE(is_empty(NULL));
+     TEST_ASSERT_TRUE(is_shutdown(NULL));
+     queue_shutdown(NULL);
+ }
+
 int main(void)
 {
   UNITY_BEGIN();
@@ -70,5 +93,6 @@ int main(void)
   RUN_TEST(test_queue_dequeue);
   RUN_TEST(test_queue_dequeue_multiple);
   RUN_TEST(test_queue_dequeue_shutdown);
+  RUN_TEST(test_null_queue_handling);
   return UNITY_END();
 }

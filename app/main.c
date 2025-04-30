@@ -180,8 +180,7 @@ for (int i = 0; i < nump; i++)
 }
 
 // Once all the producers are finished we set a flag so the consumer thread can finish up
-// Once shutdown is called your queue should drain all remaining items and be
-read for
+// Once shutdown is called your queue should drain all remaining items and be read for
 // destruction!
 queue_shutdown(pc_queue);
 /*Wait for all the the consumer threads to finish*/
